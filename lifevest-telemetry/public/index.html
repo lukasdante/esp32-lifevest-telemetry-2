@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Lifevest | Connect</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-layout">
+
+    <div class="radar-container">
+        <div class="radar-ping"></div>
+        <div class="radar-ping"></div>
+    </div>
+
+    <div class="login-card">
+        <h1>Smart Lifevest Link</h1>
+        <p>Enter your secure session ID to track the wearer.</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="text" id="lifevestId" class="force-uppercase" required placeholder="e.g., VEST-892A" autocomplete="off">
+            </div>
+            
+            <p id="loginError" style="color: #ef4444; font-size: 14px; margin-bottom: 15px; display: none; font-weight: bold;"></p>
+            
+            <button type="submit" id="loginBtn">Initiate Tracking</button>
+            <a href="/admin.html" class="lowkey-link">Or login as Admin</a>
+        </form>
+    </div>
+    
+    <script src="app.js" defer></script>
+</body>
+</html>

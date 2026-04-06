@@ -1,0 +1,12 @@
+name = "lifevest-telemetry"
+main = "src/index.ts"
+compatibility_date = "2024-04-06"
+compatibility_flags = ["nodejs_compat"]
+
+assets = { directory = "./public" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lifevest-db"
+database_id = "YOUR_PROD_D1_ID_HERE"
+preview_database_id = "DB"

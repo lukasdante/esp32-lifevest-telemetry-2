@@ -1,0 +1,784 @@
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #0f172a; 
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;     /* Fallback for older browsers */
+    height: 100dvh;    /* NEW: Dynamic height that respects mobile browser bars! */
+    overflow: hidden;  /* Keeps the native app feel */
+}
+
+/* --- Page-Specific Layouts --- */
+.login-layout {
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-layout {
+    flex-direction: column;
+}
+
+/* --- Radar Background Animation --- */
+.radar-container {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.radar-ping {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid rgba(56, 189, 248, 0.4); /* Light blue */
+    animation: ping 2.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.radar-ping:nth-child(2) {
+    animation-delay: 1.25s;
+}
+
+@keyframes ping {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(6); opacity: 0; }
+}
+
+/* --- UI Card --- */
+.login-card {
+    background-color: rgba(30, 41, 59, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid #334155;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 400px;
+    z-index: 10;
+    text-align: center;
+}
+
+.login-card h1 {
+    color: #38bdf8;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.login-card p {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+/* --- Form Elements --- */
+.form-group {
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 18px;
+    font-family: monospace;
+    text-align: center;
+    /* text-transform: uppercase; */
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+input[type="text"]::placeholder {
+    color: #475569;
+    text-transform: none;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    background-color: #0284c7; /* Solid blue */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+}
+
+button:hover {
+    background-color: #0369a1;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+
+/* --- Base & Reset --- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #0f172a; /* Dark slate */
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* --- Top Bar --- */
+.top-bar {
+    background-color: #1e293b;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.identity h2 { font-size: 18px; color: #f8fafc; display: inline-block; margin-right: 10px; }
+
+.badge {
+    font-size: 11px; font-weight: bold; padding: 4px 8px;
+    border-radius: 12px; border: 1px solid transparent;
+}
+.badge-connecting { background-color: #475569; color: #cbd5e1; }
+.badge-online { background-color: rgba(34, 197, 94, 0.2); color: #4ade80; border-color: rgba(34, 197, 94, 0.5); animation: pulse-slow 2s infinite; }
+.badge-offline { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.5); }
+
+.metrics { display: flex; align-items: center; gap: 20px; }
+
+/* Signal Bars */
+.signal-container { display: flex; align-items: flex-end; gap: 3px; height: 20px; }
+.bar { width: 6px; background-color: #475569; border-radius: 2px; transition: background-color 0.3s; }
+#bar1 { height: 6px; }
+#bar2 { height: 10px; }
+#bar3 { height: 14px; }
+#bar4 { height: 20px; }
+.bar.active { background-color: #22c55e; } /* Green */
+
+.battery-container { font-family: monospace; font-size: 16px; }
+
+/* --- Map Area --- */
+.map-container { flex: 1; border-bottom: 4px solid #334155; position: relative; z-index: 1; }
+#map { height: 100%; width: 100%; }
+
+/* --- Stats Panel --- */
+/* --- Stats Panel --- */
+.stats-panel {
+    background-color: #0f172a;
+    padding: 15px 25px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly; 
+    height: 35vh;          /* Fallback */
+    height: 35dvh;         /* NEW: Dynamic height */
+    min-height: max-content; /* Prevents text from overlapping on tiny phones */
+}
+
+.stat-box { text-align: center; }
+.stat-label { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+.stat-unit { color: #64748b; font-size: 16px; }
+
+.hr-display { display: flex; align-items: baseline; justify-content: center; gap: 10px; color: #ef4444; }
+#hrValue { font-size: 64px; font-weight: 900; font-family: monospace; }
+.heart { font-size: 28px; }
+
+.distance-display { color: #38bdf8; }
+#distanceValue { font-size: 36px; font-weight: bold; font-family: monospace; margin-right: 5px; }
+
+.divider { width: 100%; height: 1px; background-color: #1e293b; margin: 20px 0; }
+
+/* --- Animations --- */
+@keyframes pulse {
+    0%, 30%, 60% { transform: scale(1); }
+    15%, 45% { transform: scale(1.15); }
+}
+.pulse { animation: pulse 1s infinite; }
+@keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* --- Map Radar Pulse --- */
+.viewer-marker-container {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.viewer-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background-color: #38bdf8; /* Blue for viewer */
+    border: 2px solid #0f172a;
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.viewer-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    background-color: transparent;
+    border: 4px solid #38bdf8;
+    border-radius: 50%;
+    z-index: 1;
+    /* The animation duration will be injected dynamically via JS */
+}
+
+/* Update scale from 20 to 100 so it spans out massively */
+@keyframes mapRadarSweep {
+    0% { 
+        width: 0px; 
+        height: 0px; 
+        opacity: 0.8; 
+    }
+    100% { 
+        width: 3000px; /* 1500px radius */
+        height: 3000px; 
+        opacity: 0; 
+    } 
+}
+
+/* --- NEW: Wearer Map Icon Animations --- */
+.wearer-icon-container {
+    position: relative;
+    width: 16px;
+    height: 16px;
+}
+
+.wearer-dot {
+    width: 100%;
+    height: 100%;
+    background-color: #ef4444;
+    border: 2px solid #0f172a;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.8); /* Default slight blur */
+}
+
+/* This class gets injected by JS when a location update hits */
+.wearer-dot.flash {
+    animation: wearerUpdateFlash 1.5s ease-out forwards;
+}
+
+@keyframes wearerUpdateFlash {
+    0% { 
+        box-shadow: 0 0 40px 20px rgba(239, 68, 68, 1); /* Intense light up */
+        filter: brightness(1.5); 
+        transform: scale(1.2);
+    }
+    100% { 
+        box-shadow: 0 0 8px rgba(239, 68, 68, 0.8); /* Fades back to slight blur */
+        filter: brightness(1); 
+        transform: scale(1);
+    }
+}
+/* --- Map Controls --- */
+.recenter-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background-color: #0284c7;
+    color: white;   
+    border: none;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: opacity 0.3s, transform 0.3s, background-color 0.2s;
+    opacity: 1;
+    pointer-events: auto;
+    
+    /* NEW: Override the global 100% width and enforce fonts */
+    width: auto;
+    min-width: 120px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.hr-display { 
+    display: flex; 
+    align-items: center; /* Changed from baseline to center Y-axis */
+    justify-content: center; 
+    gap: 12px; 
+    color: #ef4444; 
+}
+#hrValue { 
+    font-size: 64px; 
+    font-weight: 900; 
+    font-family: monospace; 
+    line-height: 1; /* Prevents invisible padding from throwing off center */
+}
+.heart { 
+    font-size: 42px; /* Made larger to match digits */
+    line-height: 1;
+}
+
+.recenter-btn:hover {
+    background-color: #0369a1;
+}
+
+.recenter-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 10px); /* Slides down slightly when hiding */
+}
+
+/* ==========================================
+   ADMIN PAGE STYLES
+   ========================================== */
+.admin-layout {
+    flex-direction: column;
+    overflow-y: auto; /* Allow scrolling on admin page */
+}
+
+.admin-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Form takes 1/3, Table takes 2/3 */
+    gap: 20px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.admin-panel {
+    background-color: #1e293b;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.admin-panel h3 {
+    color: #f8fafc;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 10px;
+}
+
+.admin-panel label {
+    display: block;
+    color: #94a3b8;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Fleet Table */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.fleet-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.fleet-table th, .fleet-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #334155;
+}
+
+.fleet-table th {
+    background-color: #0f172a;
+    color: #94a3b8;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.fleet-table tr:hover {
+    background-color: rgba(56, 189, 248, 0.05);
+}
+
+/* Make it stack on smaller screens */
+@media (max-width: 900px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Apply this ONLY to inputs that must be uppercase */
+.force-uppercase {
+    text-transform: uppercase;
+}
+
+/* --- Admin Table Actions --- */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit {
+    background-color: transparent;
+    color: #cbd5e1;
+    border: 1px solid #64748b;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: #64748b;
+    color: #0f172a;
+}
+
+/* --- Modal Window Styles --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    transition: opacity 0.2s;
+}
+
+.modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 12px 10px;
+}
+
+.btn-danger {
+    background-color: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+}
+
+.btn-danger:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    border: 1px solid #64748b;
+    color: #cbd5e1;
+}
+
+.btn-cancel:hover {
+    background-color: #64748b;
+    color: #ffffff;
+}
+
+/* --- Mobile Back/Exit Button --- */
+.mobile-back-btn {
+    background-color: transparent !important; /* Forces override */
+    box-shadow: none !important;              /* Kills the blue shadow */
+    width: auto !important;                   /* Stops it from stretching 100% */
+    border: none;
+    color: #94a3b8; 
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px 4px 0; 
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-back-btn:hover, .mobile-back-btn:active {
+    color: #ef4444; 
+}
+
+/* --- Dynamic Battery --- */
+.battery-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.battery-icon {
+    position: relative;
+    width: 26px;
+    height: 14px;
+    border: 2px solid #cbd5e1;
+    border-radius: 3px;
+    padding: 1px;
+    box-sizing: border-box;
+}
+
+/* The battery terminal tip */
+.battery-icon::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: -4px;
+    width: 2px;
+    height: 6px;
+    background-color: #cbd5e1;
+    border-radius: 0 2px 2px 0;
+}
+
+.battery-level {
+    height: 100%;
+    width: 0%; /* This gets updated by JavaScript */
+    background-color: #22c55e; /* Default Green */
+    border-radius: 1px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+/* --- DISTRESS SYSTEM & COLORS --- */
+.text-green { color: #22c55e !important; }
+.text-red { color: #ef4444 !important; }
+.bg-green { background-color: #22c55e !important; box-shadow: 0 0 8px rgba(34, 197, 94, 0.8) !important; }
+.bg-red { background-color: #ef4444 !important; box-shadow: 0 0 8px rgba(239, 68, 68, 0.8) !important; }
+
+.hr-status-label {
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-top: -10px; /* Pulls it tighter to the digits */
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* The Gaming-Style Red Vignette */
+.distress-vignette {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none; /* Lets you click through it */
+    z-index: 9999; /* Stays on top of EVERYTHING */
+    box-shadow: inset 0 0 150px 20px rgba(239, 68, 68, 0.9);
+    animation: distress-pulse 1s infinite;
+    display: none; /* Hidden by default */
+}
+
+@keyframes distress-pulse {
+    0% { opacity: 0.5; box-shadow: inset 0 0 100px 10px rgba(239, 68, 68, 0.6); }
+    50% { opacity: 1; box-shadow: inset 0 0 200px 30px rgba(239, 68, 68, 1); }
+    100% { opacity: 0.5; box-shadow: inset 0 0 100px 10px rgba(239, 68, 68, 0.6); }
+}
+
+input[type="text"], 
+input[type="number"],
+input[type="password"] {
+    width: 100%;
+    padding: 15px;
+    background-color: #0f172a;
+    border: 1px solid #475569;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 18px;
+    font-family: monospace;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus, 
+input[type="number"]:focus,
+input[type="password"]:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+input[type="text"]::placeholder, 
+input[type="number"]::placeholder,
+input[type="password"]::placeholder {
+    color: #475569;
+}
+
+/* Removed !important from box-shadow so the radar flash animation can work again */
+.bg-green { background-color: #22c55e !important; box-shadow: 0 0 8px rgba(34, 197, 94, 0.8); }
+.bg-red { background-color: #ef4444 !important; box-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+
+/* --- Hide Number Input Arrows --- */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+}
+
+/* --- Lowkey Admin Link --- */
+.lowkey-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #64748b; /* Dark slate gray */
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.lowkey-link:hover {
+    color: #cbd5e1; /* Lights up slightly on hover */
+    text-decoration: underline;
+}
+
+/* --- Stats Panel --- */
+.stats-panel {
+    background-color: #0f172a;
+    padding: 15px 25px; /* Tighter padding to give numbers more breathing room */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly; /* Distributes vertical space perfectly */
+    height: 35vh; 
+}
+
+.stat-box { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex: 1; /* Tells the box to grow like a spring and fill all empty space */
+}
+
+.stat-label { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+.stat-unit { color: #64748b; font-size: 16px; }
+
+/* ... (Keep your .hr-display, #hrValue, etc. exactly as they are here) ... */
+
+.divider { 
+    width: 100%; 
+    height: 1px; 
+    background-color: #1e293b; 
+    margin: 5px 0; /* Removed heavy margin so flex evenly spaces it */
+    flex-shrink: 0; /* Prevents the line from being squished */
+}
+
+/* --- Last Updated Area --- */
+.last-updated-container {
+    width: 100%;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 10px;
+}
+
+#lastUpdatedText {
+    color: #64748b; 
+    font-size: 12px; 
+    font-family: monospace; 
+    font-weight: bold;
+}
+
+/* --- Navigation Mode Map Spinning --- */
+.map-container {
+    overflow: hidden; /* Hides the oversized map edges */
+}
+
+#map {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 100%; height: 100%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    transform-origin: center center;
+    transition: transform 0.1s linear; /* Smooth hardware-accelerated spinning */
+}
+
+#map.nav-spinning {
+    width: 200vw;  /* Makes map massive so rotating it doesn't show blank corners */
+    height: 200vh;
+}
+
+/* --- Viewer Navigation Arrow --- */
+.viewer-arrow-container {
+    width: 30px;
+    height: 30px;
+    position: relative;
+}
+
+.viewer-arrow {
+    width: 100%;
+    height: 100%;
+    /* Injects an inline SVG of a sleek navigation arrow */
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2338bdf8" stroke="%230f172a" stroke-width="2"><path d="M12 2L4 20l8-4 8 4z"/></svg>') no-repeat center center;
+    background-size: contain;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+    transition: transform 0.1s linear;
+    transform: rotate(0deg);
+}
+
+/* --- Mobile Navigation Button --- */
+.nav-btn {
+    position: absolute;
+    bottom: 70px;
+    right: 15px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #1e293b;
+    border: 2px solid #334155;
+    color: #94a3b8;
+    z-index: 1000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+}
+
+.nav-btn.active {
+    color: #38bdf8;
+    border-color: #38bdf8;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    background-color: #0f172a;
+}
+
+/* Hides the button on desktop/laptops */
+@media (min-width: 768px) {
+    .nav-btn { display: none; }
+}

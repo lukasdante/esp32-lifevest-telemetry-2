@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Lifevest | Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body class="admin-layout">
+    <div id="adminAuthOverlay" class="modal" style="background: #0f172a; z-index: 9999;">
+        <div class="modal-content admin-panel" style="text-align: center; max-width: 400px;">
+            <h3>Admin Login</h3>
+            <p style="color: #94a3b8; font-size: 14px; margin-bottom: 25px;">Enter admin password to access the fleet.</p>
+            
+            <div class="form-group">
+                <input type="password" id="adminPinInput" placeholder="••••••••" style="font-size: 24px;">
+            </div>
+            
+            <p id="adminAuthError" style="color: #ef4444; font-size: 14px; display: none; margin-bottom: 15px; font-weight: bold;">Invalid Password</p>
+            
+            <button onclick="verifyAdminPin()">Unlock System</button>
+            
+            <a href="/index.html" class="lowkey-link" style="display: block; margin-top: 20px;">Or login as regular user</a>
+        </div>
+    </div>
+    <header class="top-bar">
+        <div class="identity">
+            <h2>Admin Control Center</h2>
+        </div>
+        <div class="metrics">
+            <button onclick="sessionStorage.removeItem('adminPin'); localStorage.removeItem('targetLifevestId'); window.location.href='/index.html'" class="btn-danger" style="padding: 8px 16px;">
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <main class="admin-container" id="adminDashboard">
+        
+        <section class="admin-panel add-device-panel">
+            <h3>Register New Hardware</h3>
+            <form id="addDeviceForm">
+                <div class="form-group">
+                    <label>Hardware MAC/ID</label>
+                    <input type="text" id="newHwId" class="force-uppercase" required placeholder="e.g., ESP32-MAC-123">
+                </div>
+                <div class="form-group">
+                    <label>Initial Login Session ID</label>
+                    <input type="text" id="newLoginId" class="force-uppercase" required placeholder="e.g., VEST-101">
+                </div>
+                <div class="form-group">
+                    <label>Device Name/Alias</label>
+                    <input type="text" id="newName" required placeholder="e.g., Bravo Vest">
+                </div>
+                <div class="form-group">
+                    <label>Base Station Location</label>
+                    <input type="text" id="newLocation" required placeholder="e.g., Manila Bay">
+                </div>
+                <p id="adminFormError" style="color: #ef4444; font-size: 14px; display: none;"></p>
+                <button type="submit" id="addDeviceBtn">Add Device to Fleet</button>
+            </form>
+            <hr style="border-color: #334155; margin: 30px 0;">
+            <h3>Global Settings</h3>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>Update Frequency (ms)</label>
+                    <input type="number" id="setUpdateFreq" required>
+                </div>
+                <div class="form-group">
+                    <label>Distress Threshold (BPM)</label>
+                    <input type="number" id="setHrThreshold" required>
+                </div>
+                <div class="form-group">
+                    <label>Change Admin Password (Leave blank to keep)</label>
+                    <input type="password" id="setAdminPin" placeholder="Enter new password">
+                </div>
+                <button type="submit" id="saveSettingsBtn">Save Settings</button>
+            </form>
+        </section>
+
+        <section class="admin-panel fleet-panel">
+            <h3>Active Fleet</h3>
+            <div class="table-responsive">
+                <table class="fleet-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Hardware ID</th>
+                            <th>Device Name</th>
+                            <th>Current Login ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fleetTableBody">
+                        <tr><td colspan="5" style="text-align: center;">Loading fleet data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content admin-panel">
+            <h3>Edit Device Configuration</h3>
+            <form id="editDeviceForm">
+                <input type="hidden" id="editOldHwId">
+                
+                <div class="form-group">
+                    <label>Hardware MAC/ID</label>
+                    <input type="text" id="editHwId" class="force-uppercase" required>
+                </div>
+                <div class="form-group">
+                    <label>Login Session ID</label>
+                    <input type="text" id="editLoginId" class="force-uppercase" required>
+                </div>
+                <div class="form-group">
+                    <label>Device Name/Alias</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label>Base Station Location</label>
+                    <input type="text" id="editLocation" required>
+                </div>
+                
+                <p id="editFormError" style="color: #ef4444; font-size: 14px; display: none; margin-bottom: 10px;"></p>
+                
+                <div class="modal-actions">
+                    <button type="submit" id="saveEditBtn">Save Changes</button>
+                    <button type="button" id="deleteDeviceBtn" class="btn-danger">Delete</button>
+                    <button type="button" onclick="closeEditModal()" class="btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="deleteConfirmModal" class="modal hidden" style="z-index: 2010;"> <div class="modal-content admin-panel" style="text-align: center; max-width: 400px;">
+            <h3 style="color: #ef4444; border-bottom: none; margin-bottom: 10px;">⚠️ Confirm Deletion</h3>
+            <p style="color: #cbd5e1; font-size: 14px; margin-bottom: 25px; line-height: 1.5;">
+                Are you sure you want to permanently delete <br>
+                <strong id="deleteTargetHwId" style="color: #f8fafc; font-size: 18px; font-family: monospace; display: block; margin: 10px 0;"></strong> 
+                and all of its tracking history?<br>
+                <em>This action cannot be undone.</em>
+            </p>
+            
+            <div class="modal-actions">
+                <button type="button" onclick="closeDeleteConfirmModal()" class="btn-cancel">Cancel</button>
+                <button type="button" id="confirmDeleteActionBtn" class="btn-danger" style="background-color: #ef4444; color: white;">Yes, Delete Everything</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

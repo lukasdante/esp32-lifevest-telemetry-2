@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Lifevest | Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M 25 15 C 10 25 15 50 15 75 C 15 85 20 90 30 90 L 40 90 L 40 35 C 40 25 60 25 60 35 L 60 90 L 70 90 C 80 90 85 85 85 75 C 85 50 90 25 75 15 C 65 8 50 20 50 20 C 50 20 35 8 25 15 Z' fill='%2338bdf8'/><rect x='20' y='45' width='60' height='6' fill='%230f172a'/><rect x='20' y='65' width='60' height='6' fill='%230f172a'/><rect x='46' y='43' width='8' height='10' fill='%23cbd5e1' rx='2'/><rect x='46' y='63' width='8' height='10' fill='%23cbd5e1' rx='2'/></svg>">
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+<body class="dashboard-layout">
+    <div id="distressOverlay" class="distress-vignette"></div>
+    <header class="top-bar">
+        <div class="identity" style="display: flex; align-items: center; gap: 8px;">
+            <button onclick="localStorage.removeItem('targetLifevestId'); window.location.href='/index.html'" class="mobile-back-btn" title="Exit Tracking">
+                &#10094; </button>
+            <h2 id="displayId" style="margin: 0;">Loading...</h2>
+            <span id="statusBadge" class="badge badge-connecting">Connecting</span>
+        </div>
+        
+        <div class="metrics">
+            <div class="signal-container" title="LoRa Signal">
+                <div class="bar" id="bar1"></div>
+                <div class="bar" id="bar2"></div>
+                <div class="bar" id="bar3"></div>
+                <div class="bar" id="bar4"></div>
+            </div>
+            <div class="battery-container">
+                <div class="battery-wrapper" title="Battery Level">
+                    <span id="battPct" style="font-size: 14px;">--%</span>
+                    <div class="battery-icon">
+                        <div id="battLevel" class="battery-level"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="map-container">
+        <div id="map"></div>
+        <button id="recenterBtn" class="recenter-btn hidden">Recenter</button>
+        
+        <button id="navModeBtn" class="nav-btn" title="Start Navigation" onclick="toggleNavMode()">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+            </svg>
+        </button>
+    </main>
+
+    <div class="action-bar" style="background-color: #0f172a; padding: 15px 20px; display: flex; justify-content: center; border-bottom: 2px solid #1e293b; z-index: 10;">
+        <button id="signalBtn" onclick="triggerSignal()" style="max-width: 400px; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);">
+            Activate Signaling
+        </button>
+    </div>
+
+    <footer class="stats-panel">
+        
+        <div class="stat-box">
+            <p class="stat-label">Heart Rate (BPM)</p>
+            <div class="hr-display">
+                <span id="hrValue" class="text-green">--</span>
+            </div>
+            <div id="hrStatusLabel" class="hr-status-label text-green">NORMAL</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="stat-box">
+            <p class="stat-label">Distance (meters)</p>
+            <div class="distance-display">
+                <span id="distanceValue">--</span>
+            </div>
+        </div>
+
+        <div class="last-updated-container">
+            <p id="lastUpdatedText">Last updated: Waiting for ping...</p>
+        </div>
+
+    </footer>
+</body>
+</html>
