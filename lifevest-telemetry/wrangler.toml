@@ -8,5 +8,8 @@ assets = { directory = "./public" }
 [[d1_databases]]
 binding = "DB"
 database_name = "lifevest-db"
-database_id = "YOUR_PROD_D1_ID_HERE"
+database_id = "7e865b2d-fdd5-479c-ab56-4e566605dd53"
 preview_database_id = "DB"
+
+[triggers]
+crons = ["0 0 * * *"]

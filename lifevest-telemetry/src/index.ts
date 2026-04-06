@@ -207,4 +207,16 @@ app.put('/api/settings', async (c) => {
 });
 
 
-export default app
+// Export the app for web requests, AND a scheduled task for database cleanup
+export default {
+  fetch: app.fetch,
+  
+  // This runs automatically based on your wrangler.toml CRON schedule
+  async scheduled(event: any, env: Bindings, ctx: any) {
+    console.log("Running daily telemetry cleanup...");
+    // Deletes any telemetry rows older than 24 hours
+    ctx.waitUntil(
+      env.DB.prepare(`DELETE FROM Telemetry WHERE timestamp < datetime('now', '-1 day')`).run()
+    );
+  }
+};

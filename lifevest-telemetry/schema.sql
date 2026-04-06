@@ -1,22 +1,23 @@
--- 1. Nuke everything in the correct order to avoid Foreign Key locks
+-- Drop tables if they already exist (useful for fast resetting)
 DROP TABLE IF EXISTS Telemetry;
-DROP TABLE IF EXISTS MappedSessions; 
 DROP TABLE IF EXISTS Devices;
+DROP TABLE IF EXISTS Settings;
 
--- 2. Build the new merged Devices table
+-- 1. Create Devices Table
 CREATE TABLE Devices (
     hw_id TEXT PRIMARY KEY,
     login_id TEXT UNIQUE,
-    name TEXT NOT NULL,
+    name TEXT,
     base_location TEXT,
-    is_active BOOLEAN DEFAULT 1,
+    is_active INTEGER DEFAULT 1,
+    pending_command TEXT DEFAULT 'NONE',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Build the Telemetry table
+-- 2. Create Telemetry Table
 CREATE TABLE Telemetry (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hw_id TEXT NOT NULL,
+    hw_id TEXT,
     lat REAL,
     lng REAL,
     heart_rate INTEGER,
@@ -24,5 +25,21 @@ CREATE TABLE Telemetry (
     rssi INTEGER,
     snr REAL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(hw_id) REFERENCES Devices(hw_id)
+    FOREIGN KEY(hw_id) REFERENCES Devices(hw_id) ON DELETE CASCADE
 );
+
+-- 3. Create Settings Table
+CREATE TABLE Settings (
+    id INTEGER PRIMARY KEY,
+    update_freq INTEGER,
+    hr_threshold INTEGER,
+    admin_pin TEXT
+);
+
+-- 4. Inject the Default System Settings
+INSERT INTO Settings (id, update_freq, hr_threshold, admin_pin) 
+VALUES (1, 3000, 100, '123456');
+
+-- 5. (Optional) Inject your first testing device
+INSERT INTO Devices (hw_id, login_id, name, base_location) 
+VALUES ('HW-ESP32-001', 'VEST-892A', 'Alpha Vest', 'Manila Bay');
