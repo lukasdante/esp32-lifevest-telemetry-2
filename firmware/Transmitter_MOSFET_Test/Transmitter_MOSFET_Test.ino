@@ -4,8 +4,7 @@
 #define NSS 4
 #define RST 5
 #define DI0 2
-#define BUZZER_PIN 27
-#define LED_PIN 26
+#define MOSFET_PIN 26
 
 #define TRANSMISSION_PERIOD 3000
 #define DEVICE_ID 1
@@ -41,8 +40,7 @@ void setup() {
   delay(2000);
 
   Serial.println("Setting up transmitter TEST station...");
-  pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(LED_PIN, OUTPUT);
+  pinMode(MOSFET_PIN, OUTPUT);
 
   LoRa.setPins(NSS, RST, DI0);
   attemptLoraConnection();
@@ -70,9 +68,9 @@ void loop() {
 
 void signalInit(int count, int time_delay) {
   for (int i=0; i<count; i++) {
-    digitalWrite(BUZZER_PIN, HIGH);
+    digitalWrite(MOSFET_PIN, HIGH);
     delay(time_delay);
-    digitalWrite(BUZZER_PIN, LOW);
+    digitalWrite(MOSFET_PIN, LOW);
     delay(time_delay);
   }
 }

@@ -1,0 +1,8 @@
+Metrics:
+	1. Distance from base station (LoRa-based) 
+	2. Accuracy of GPS data (GPS based)
+	3. Time to lock GPS at open area
+	4. Accuracy of heart rate sensor when submerged
+	5. Time delay before signaling (from web to device)
+	6. Time to fully charge the device wirelessly
+	7. 

@@ -136,7 +136,7 @@ void sendDataAndCheckPiggyback(DataPacket received) {
   http.end();
 }
 
-void sendCommandToEdge(uint8_t targetID, uint8_t cmdCode) {`
+void sendCommandToEdge(uint8_t targetID, uint8_t cmdCode) {
   CommandPacket cmd = {PASSWORD_BYTE, targetID, cmdCode};
 
   Serial.println("Triple-Firing Command to Vest...");

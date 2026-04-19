@@ -1,0 +1,19 @@
+Bat+ -> TP4056 Bat +
+Bat- -> TP4056 Bat -
+
+TP4056 Out+ -> 12V Boost In+
+TP4056 Out+ -> 5V Boost In+
+TP4056 Out- -> 12V Boost In-
+TP4056 Out- -> 5V Boost In-
+
+12V Boost Out+ -> 12V LED+
+12V Boost Out+ -> 12V Buzzer+
+12V LED- -> IRLZ44N Drain
+12V Buzzer- -> IRLZ44N Drain
+
+GPIO26 -> 220 ohms -> IRLZ44N Gate
+IRLZ44N Gate -> 10k ohms -> ESP32 GND
+IRLZ44N Source -> 12V Boost Out-
+
+5V Boost Out+ -> ESP32 5Vin
+5V Boost Out- -> ESP32 GND

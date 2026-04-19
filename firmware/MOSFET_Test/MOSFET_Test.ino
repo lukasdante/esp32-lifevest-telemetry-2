@@ -3,7 +3,7 @@
  * Hardware: Pin 27 connected to MOSFET Gate
  */
 
-#define MOSFET_PIN 27
+#define MOSFET_PIN 26
 
 void setup() {
   Serial.begin(115200);
