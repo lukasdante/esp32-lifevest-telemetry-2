@@ -11,6 +11,14 @@ CREATE TABLE Devices (
     base_location TEXT,
     is_active INTEGER DEFAULT 1,
     pending_command TEXT DEFAULT 'NONE',
+    
+    -- Device-Specific Parameters
+    automate_signal INTEGER DEFAULT 0,
+    actuate_led INTEGER DEFAULT 1,
+    actuate_buzzer INTEGER DEFAULT 1,
+    device_hr_threshold INTEGER DEFAULT 100,
+    signal_duration INTEGER DEFAULT 2,
+    
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -21,7 +29,6 @@ CREATE TABLE Telemetry (
     lat REAL,
     lng REAL,
     heart_rate INTEGER,
-    battery_pct INTEGER,
     rssi INTEGER,
     snr REAL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,

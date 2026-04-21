@@ -47,17 +47,18 @@ void setup() {
  
   Serial.println("Setup done, preparing to transmit proxy data...");
   delay(500);
-  signalInit(2, 200);
+  // signalInit(2, 200);
+  digitalWrite(MOSFET_PIN, HIGH);
 }
 
 void loop() {
   if (millis() - lastTransmissionTime >= TRANSMISSION_PERIOD) {
       lastTransmissionTime = millis();
 
-      if (!gpsInitialized) {
-        signalInit(3, 200); 
-        gpsInitialized = true;
-      }
+      // if (!gpsInitialized) {
+      //   signalInit(3, 200); 
+      //   gpsInitialized = true;
+      // }
 
       proxyBpm = random(60, 100);
       proxyBatt = random(80, 100); // Simulate battery draining/fluctuating

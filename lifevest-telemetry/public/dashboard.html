@@ -32,14 +32,12 @@
                 <div class="bar" id="bar3"></div>
                 <div class="bar" id="bar4"></div>
             </div>
-            <div class="battery-container">
-                <div class="battery-wrapper" title="Battery Level">
-                    <span id="battPct" style="font-size: 14px;">--%</span>
-                    <div class="battery-icon">
-                        <div id="battLevel" class="battery-level"></div>
-                    </div>
-                </div>
-            </div>
+            <button id="openSettingsBtn" class="mobile-back-btn" title="Device Settings" style="margin-left: 15px;">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="#cbd5e1" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.3s; cursor: pointer;">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
         </div>
     </header>
     <main class="map-container">
@@ -83,5 +81,37 @@
         </div>
 
     </footer>
+<div id="deviceSettingsModal" class="modal hidden" style="z-index: 2010;">
+    <div class="modal-content admin-panel" style="max-width: 400px;">
+        <h3>Vest Parameters</h3>
+        <form id="deviceSettingsForm">
+            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="margin-bottom: 0;">Automate Signal</label>
+                <input type="checkbox" id="setAutomateSignal" style="width: 20px; height: 20px; cursor: pointer;">
+            </div>
+            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="margin-bottom: 0;">Actuate LED</label>
+                <input type="checkbox" id="setActuateLed" style="width: 20px; height: 20px; cursor: pointer;">
+            </div>
+            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="margin-bottom: 0;">Actuate Buzzer</label>
+                <input type="checkbox" id="setActuateBuzzer" style="width: 20px; height: 20px; cursor: pointer;">
+            </div>
+            <div class="form-group">
+                <label>Heart Rate Threshold (BPM)</label>
+                <input type="number" id="setDeviceHrThreshold" required placeholder="e.g., 100">
+            </div>
+            <div class="form-group">
+                <label>Signal Duration (Seconds)</label>
+                <input type="number" id="setSignalDuration" required placeholder="e.g., 5">
+            </div>
+            
+            <div class="modal-actions">
+                <button type="submit" id="saveDeviceSettingsBtn" style="background-color: #0284c7;">Save & Sync</button>
+                <button type="button" onclick="document.getElementById('deviceSettingsModal').classList.add('hidden')" class="btn-cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

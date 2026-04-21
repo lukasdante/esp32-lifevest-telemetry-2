@@ -179,8 +179,6 @@ body {
 #bar4 { height: 20px; }
 .bar.active { background-color: #22c55e; } /* Green */
 
-.battery-container { font-family: monospace; font-size: 16px; }
-
 /* --- Map Area --- */
 .map-container { flex: 1; border-bottom: 4px solid #334155; position: relative; z-index: 1; }
 #map { height: 100%; width: 100%; }
@@ -537,43 +535,6 @@ body {
 
 .mobile-back-btn:hover, .mobile-back-btn:active {
     color: #ef4444; 
-}
-
-/* --- Dynamic Battery --- */
-.battery-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.battery-icon {
-    position: relative;
-    width: 26px;
-    height: 14px;
-    border: 2px solid #cbd5e1;
-    border-radius: 3px;
-    padding: 1px;
-    box-sizing: border-box;
-}
-
-/* The battery terminal tip */
-.battery-icon::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    right: -4px;
-    width: 2px;
-    height: 6px;
-    background-color: #cbd5e1;
-    border-radius: 0 2px 2px 0;
-}
-
-.battery-level {
-    height: 100%;
-    width: 0%; /* This gets updated by JavaScript */
-    background-color: #22c55e; /* Default Green */
-    border-radius: 1px;
-    transition: width 0.3s ease, background-color 0.3s ease;
 }
 
 /* --- DISTRESS SYSTEM & COLORS --- */

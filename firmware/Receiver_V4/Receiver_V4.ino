@@ -10,8 +10,8 @@
 #define DIO0 2
 
 // --- NETWORK CONFIGURATION ---
-const char* ssid = "ub-lifevest"; 
-const char* password = "ub-lifevest"; 
+const char* ssid = "ub-lifevest";
+const char* password = "ub-lifevest";
 const char* telemetryEndpoint = "https://smartlifevest.com/api/update-telemetry/";
 
 const uint8_t PASSWORD_BYTE = 0x69;

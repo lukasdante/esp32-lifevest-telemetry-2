@@ -1,0 +1,39 @@
+TRANSMITTER FEATURES
+	1. Attempts to reconnect LoRa when disconnected until connected.
+	2. Attempts to reconnect GPS when disconnected until connected.
+	3. Sends (0, 0) when GPS has been disconnected.
+	4. Determines pulse rate dynamically with the heart rate sensor.
+	5. Signals when the system has been boot up.
+	6. Signals when GPS is connected to satellite for the first time.
+	7. Can be charged wirelessly.
+	8. Can receive commands for actuating the buzzer or LED.
+	9. Can receive commands in changing global settings.
+	10. Uses precise PWM to not overload the power system in actuating the buzzer and LED.
+	11. Uses asynchronous actuation of the LED and buzzer for non-blocking logic.
+	12. Sends GPS, heart rate, password, and device ID to receiver.
+	13. Configurable settings for update period, automated signaling, heart rate threshold, and signaling duration.
+	14. Sends 0 bpm when the leads are disconnected.
+
+RECEIVER FEATURES
+	1. Attempts to reconnect LoRa when disconnected until connected.
+	2. Attempts to reconnect WiFi when disconnected until connected.
+	3. Sends GPS, heart rate, and signal strength data for a specific device ID to web by POST.
+	4. Checks if the password and device ID matches by mapping it.
+	5. Receives GPS, heart rate, password, and device ID from transmitter.
+	6. Sends commands to the transmitter by triple firing.
+	7. Receives commands from web from HTTP piggybacking.
+
+WEB FEATURES
+	1. Receives GPS, heart rate, and signal strength data and display it using POST.
+	2. Sends commands to the receiver by HTTP piggybacking.
+	3. Converts (0, 0) location data to "Waiting for GPS."
+	4. Converts 0 bpm data to "Heart rate sensor leads disconnected."
+	5. Converts signal strength 
+
+TEST
+	1. HTTP Piggybacking
+		a. Actuation
+		b. Settings
+	2. Data updates
+	3. Saving settings
+

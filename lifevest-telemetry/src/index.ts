@@ -6,82 +6,100 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-// 🛑 Notice how we completely removed serveStatic and the manifest imports!
-// Cloudflare handles serving the HTML automatically now.
-
-// ESP32 Base Station POST Endpoint
-// ESP32 Base Station POST Endpoint
+// 1. ESP32 Base Station POST Endpoint (Telemetry + Piggyback Check)
 app.post('/api/telemetry', async (c) => {
   const payload = await c.req.json();
-  // Using vest_id to match your new C++ payload format
-  const { vest_id, latitude, longitude, heart_rate, batt, rssi, snr } = payload; 
+  const { vest_id, latitude, longitude, heart_rate, rssi, snr } = payload; 
 
-  // 1. Save Telemetry (Assuming vest_id is mapped to hw_id or similar in your DB logic)
-  // Note: Adjust the column names here if your C++ payload keys differ from your DB keys!
+  // Format the ID to match the database ('1' -> 'HW-ESP32-001')
+  const formattedHwId = `HW-ESP32-${String(vest_id).padStart(3, '0')}`;
+
+  // Save Telemetry
   await c.env.DB.prepare(
-    `INSERT INTO Telemetry (hw_id, lat, lng, heart_rate, battery_pct, rssi, snr) 
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).bind(vest_id, latitude, longitude, heart_rate, batt || 100, rssi || 0, snr || 0).run();
+    `INSERT INTO Telemetry (hw_id, lat, lng, heart_rate, rssi, snr) 
+     VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(formattedHwId, latitude, longitude, heart_rate, rssi || 0, snr || 0).run();
 
-  // 2. Check for Piggyback Commands
+  // Check for Piggyback Commands
   const device = await c.env.DB.prepare(
     `SELECT pending_command FROM Devices WHERE hw_id = ?`
-  ).bind(vest_id).first();
+  ).bind(formattedHwId).first();
 
-  const command = device?.pending_command || 'NONE';
+  // Explicitly declare variables here
+  const commandStr = (device?.pending_command as string) || 'NONE';
+  let piggybackData = {};
 
-  // 3. If there was a command, clear it from the queue so we don't spam the vest
-  if (command !== 'NONE') {
+  // If there is a command, mark it as 'AWAITING_ACK' and parse the JSON
+  if (commandStr !== 'NONE' && commandStr !== 'AWAITING_ACK') {
     await c.env.DB.prepare(
-      `UPDATE Devices SET pending_command = 'NONE' WHERE hw_id = ?`
-    ).bind(vest_id).run();
+      `UPDATE Devices SET pending_command = 'AWAITING_ACK' WHERE hw_id = ?`
+    ).bind(formattedHwId).run();
+
+    try {
+      if (commandStr === 'SIGNAL') {
+        piggybackData = { cmd: 1 }; // Fallback for old database entries
+      } else {
+        piggybackData = JSON.parse(commandStr);
+      }
+    } catch (e) {
+      console.error("Failed to parse command payload");
+    }
   }
 
-  // 4. Return the piggyback JSON!
-  return c.json({ success: true, command: command });
+  // Return the flat JSON response
+  return c.json({ success: true, ...piggybackData });
+});
+
+// 2. Web Client POST Endpoint: Receiver confirms command actuation
+app.post('/api/telemetry/ack', async (c) => {
+  const payload = await c.req.json();
+  const { vest_id } = payload;
+  
+  const formattedHwId = `HW-ESP32-${String(vest_id).padStart(3, '0')}`;
+
+  // Log it so you can see it in the wrangler terminal
+  console.log(`\n[WEB BACKEND] 🟢 ACK Received for ${formattedHwId}. Clearing database queue!\n`);
+
+  // Clear the queue! The cycle is complete.
+  await c.env.DB.prepare(
+    `UPDATE Devices SET pending_command = 'NONE' WHERE hw_id = ?`
+  ).bind(formattedHwId).run();
+
+  return c.json({ success: true });
 });
 
 // Web Client GET Endpoint
 app.get('/api/live/:login_id', async (c) => {
   const loginId = c.req.param('login_id')
   
-  // 1. FIRST, check if the device actually exists and is active
+  // 1. Fetch device AND its specific settings
   const device = await c.env.DB.prepare(
-    `SELECT hw_id FROM Devices WHERE login_id = ? AND is_active = 1`
+    `SELECT hw_id, automate_signal, actuate_led, actuate_buzzer, device_hr_threshold, signal_duration, pending_command 
+     FROM Devices WHERE login_id = ? AND is_active = 1`
   ).bind(loginId).first()
 
-  // If the device doesn't exist, THEN we throw the 404 error
-  if (!device) {
-    return c.json({ error: "Invalid VEST ID", isOnline: false }, 404)
-  }
+  if (!device) return c.json({ error: "Invalid VEST ID", isOnline: false }, 404)
 
-  // 2. SECOND, get the latest telemetry for this specific hardware
   const data = await c.env.DB.prepare(
     `SELECT * FROM Telemetry WHERE hw_id = ? ORDER BY timestamp DESC LIMIT 1`
   ).bind(device.hw_id as string).first()
 
-  // 3. If the device exists, but has NO data yet, let the user in but tell the UI to wait
-  if (!data) {
-    return c.json({ 
-      isOnline: false, 
-      waitingForData: true, 
-      message: "Waiting for first ping from hardware..." 
-    })
-  }
+  if (!data) return c.json({ isOnline: false, waitingForData: true, message: "Waiting for first ping..." })
 
   const lastSeen = new Date(data.timestamp as string).getTime()
-  const now = new Date().getTime()
-  const isOnline = (now - lastSeen) < 30000
+  const isOnline = (new Date().getTime() - lastSeen) < 30000
 
-  return c.json({ ...data, isOnline, waitingForData: false })
-})
+  // Inject device settings into the payload
+  return c.json({ ...data, isOnline, waitingForData: false, deviceSettings: device })
+});
 
 // Web Client POST Endpoint: Queue a signal command
 app.post('/api/live/:login_id/signal', async (c) => {
   const loginId = c.req.param('login_id');
-  // Put the SIGNAL command in the queue for this specific vest
+  
+  // CHANGED: We now save the exact JSON string the ESP32 expects for Command 1
   await c.env.DB.prepare(
-    `UPDATE Devices SET pending_command = 'SIGNAL' WHERE login_id = ?`
+    `UPDATE Devices SET pending_command = '{"cmd":1}' WHERE login_id = ?`
   ).bind(loginId).run();
   
   return c.json({ success: true, message: "Signal queued for next ping." });
@@ -220,3 +238,36 @@ export default {
     );
   }
 };
+
+// Web Client POST Endpoint: Update device settings & queue Command 2
+app.post('/api/live/:login_id/settings', async (c) => {
+  const loginId = c.req.param('login_id');
+  const payload = await c.req.json();
+  const { automate_signal, actuate_led, actuate_buzzer, hr_threshold, signal_duration } = payload;
+
+  // Format the command string payload for the ESP32 (cmd: 2 designates the action)
+  const cmd2Payload = JSON.stringify({
+    cmd: 2,
+    auto: automate_signal ? 1 : 0,
+    led: actuate_led ? 1 : 0,
+    buz: actuate_buzzer ? 1 : 0,
+    hr: hr_threshold,
+    dur: signal_duration
+  });
+
+  await c.env.DB.prepare(
+    `UPDATE Devices 
+     SET automate_signal = ?, actuate_led = ?, actuate_buzzer = ?, device_hr_threshold = ?, signal_duration = ?, pending_command = ?
+     WHERE login_id = ?`
+  ).bind(
+    automate_signal ? 1 : 0, 
+    actuate_led ? 1 : 0, 
+    actuate_buzzer ? 1 : 0, 
+    hr_threshold, 
+    signal_duration, 
+    cmd2Payload, 
+    loginId
+  ).run();
+
+  return c.json({ success: true, message: "Settings saved and Command 2 queued." });
+});

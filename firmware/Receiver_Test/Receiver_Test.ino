@@ -14,7 +14,7 @@ const char* endpoint = "https://www.smartlifevest.com/api/telemetry";
 // 3. EXACT LORA PINS USED BY YOUR HARDWARE
 #define NSS 4
 #define RST 5
-#define DI0 2
+#define DI0 2 
 #define BAND 433E6 
 
 // 4. DATA STRUCTURE (Must exactly match the Transmitter)

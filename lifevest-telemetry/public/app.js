@@ -342,8 +342,21 @@ function updateDashboardUI(data) {
     
     hrElement.innerText = hrVal || '--';
 
-    // Distress check
-    if (hrVal >= globalSettings.hr_threshold) {
+    const activeThreshold = data.deviceSettings?.device_hr_threshold || globalSettings.hr_threshold || 100;
+
+    // Pre-fill the form (only if the user isn't currently typing in it)
+    if (data.deviceSettings && document.getElementById('deviceSettingsModal').classList.contains('hidden')) {
+        document.getElementById('setAutomateSignal').checked = !!data.deviceSettings.automate_signal;
+        document.getElementById('setActuateLed').checked = !!data.deviceSettings.actuate_led;
+        document.getElementById('setActuateBuzzer').checked = !!data.deviceSettings.actuate_buzzer;
+        document.getElementById('setDeviceHrThreshold').value = data.deviceSettings.device_hr_threshold;
+        document.getElementById('setSignalDuration').value = data.deviceSettings.signal_duration;
+    }
+
+    hrElement.innerText = hrVal || '--';
+
+    // Distress check using activeThreshold
+    if (hrVal >= activeThreshold) {
         // ACTIVATE DISTRESS MODE
         hrElement.className = "text-red";
         hrLabel.className = "hr-status-label text-red";
@@ -364,31 +377,64 @@ function updateDashboardUI(data) {
         hrLabel.innerText = "WAITING";
         distressOverlay.style.display = "none";
     }
-
-    // 6. Update Battery Text AND Dynamic Icon
-    const battPctText = document.getElementById('battPct');
-    const battLevelBar = document.getElementById('battLevel');
-    
-    if (data.battery_pct !== undefined && data.battery_pct !== null) {
-        battPctText.innerText = data.battery_pct + '%';
-        battLevelBar.style.width = data.battery_pct + '%';
-        
-        // Color shifts based on power level
-        if (data.battery_pct > 50) {
-            battLevelBar.style.backgroundColor = '#22c55e'; // Green
-        } else if (data.battery_pct > 20) {
-            battLevelBar.style.backgroundColor = '#eab308'; // Yellow
-        } else {
-            battLevelBar.style.backgroundColor = '#ef4444'; // Red
-        }
-    } else {
-        battPctText.innerText = '--%';
-        battLevelBar.style.width = '0%';
-    }
     
     // 7. Update Signal Bars and Viewport
     updateSignalBars(data.rssi);
     updateMapAndDistance(); 
+
+    // --- NEW: Universal Smart Button ACK Logic ---
+    const signalBtn = document.getElementById('signalBtn');
+    const syncBtn = document.getElementById('saveDeviceSettingsBtn');
+
+    if (data.deviceSettings) {
+        const cmdState = data.deviceSettings.pending_command;
+
+        if (cmdState === 'NONE') {
+            // SYSTEM IDLE: Both buttons are ready
+            if (signalBtn) {
+                signalBtn.innerHTML = "Activate Signaling";
+                signalBtn.style.backgroundColor = ""; 
+                signalBtn.style.opacity = "1";
+                signalBtn.disabled = false;
+            }
+            if (syncBtn) {
+                syncBtn.innerHTML = "Save & Sync";
+                syncBtn.style.backgroundColor = "#0284c7"; // Default Blue
+                syncBtn.disabled = false;
+            }
+        } 
+        else if (cmdState === 'AWAITING_ACK') {
+            // VEST PROCESSING: Lock both buttons while the radio does its job
+            if (signalBtn) {
+                signalBtn.innerHTML = "Waiting for Vest ACK...";
+                signalBtn.style.backgroundColor = "#eab308"; // Yellow
+                signalBtn.style.opacity = "1";
+                signalBtn.disabled = true;
+            }
+            if (syncBtn) {
+                syncBtn.innerHTML = "Waiting for Vest ACK...";
+                syncBtn.style.backgroundColor = "#eab308"; // Yellow
+                syncBtn.disabled = true;
+            }
+        } 
+        else {
+            // QUEUED IN DATABASE: Figure out which command is waiting for the next ping
+            let isSignal = cmdState.includes('"cmd":1') || cmdState === 'SIGNAL';
+            let isSettings = cmdState.includes('"cmd":2');
+
+            if (signalBtn) {
+                signalBtn.innerHTML = isSignal ? "Queued for next ping..." : "System Busy...";
+                signalBtn.style.backgroundColor = isSignal ? "#22c55e" : "#64748b";
+                signalBtn.style.opacity = isSignal ? "0.8" : "0.5";
+                signalBtn.disabled = true;
+            }
+            if (syncBtn) {
+                syncBtn.innerHTML = isSettings ? "Queued for next ping..." : "System Busy...";
+                syncBtn.style.backgroundColor = isSettings ? "#22c55e" : "#64748b";
+                syncBtn.disabled = true;
+            }
+        }
+    }
 }
 
 function updateSignalBars(rssi = -120) {
@@ -759,21 +805,13 @@ async function triggerSignal() {
     try {
         const res = await fetch(`/api/live/${targetId}/signal`, { method: 'POST' });
         if (!res.ok) throw new Error("Failed to queue.");
-        
-        btn.innerHTML = "Queued for next ping";
-        btn.style.backgroundColor = "#22c55e"; // Turn green temporarily to show success
+        // We do NOT reset the button here anymore. The live telemetry polling will handle it!
     } catch (err) {
         alert("Network Error: Could not reach server.");
         btn.innerHTML = "Activate Signaling";
-    } finally {
-        // Reset the button after 5 seconds
-        setTimeout(() => {
-            btn.innerHTML = "Activate Signaling";
-            btn.style.backgroundColor = ""; // Removing this lets it return to your default blue CSS!
-            btn.style.opacity = "1";
-            btn.disabled = false;
-        }, 5000);
-    }
+        btn.style.opacity = "1";
+        btn.disabled = false;
+    } 
 }
 
 // ==========================================
@@ -853,3 +891,44 @@ async function toggleNavMode() {
         window.addEventListener('deviceorientation', navListener, true);
     }
 }
+
+// ==========================================
+// DEVICE SETTINGS MODAL
+// ==========================================
+document.getElementById('openSettingsBtn')?.addEventListener('click', () => {
+    document.getElementById('deviceSettingsModal').classList.remove('hidden');
+});
+
+document.getElementById('deviceSettingsForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!targetId) return;
+
+    const btn = document.getElementById('saveDeviceSettingsBtn');
+    btn.innerText = "Syncing...";
+    btn.disabled = true;
+
+    const payload = {
+        automate_signal: document.getElementById('setAutomateSignal').checked,
+        actuate_led: document.getElementById('setActuateLed').checked,
+        actuate_buzzer: document.getElementById('setActuateBuzzer').checked,
+        hr_threshold: parseInt(document.getElementById('setDeviceHrThreshold').value),
+        signal_duration: parseInt(document.getElementById('setSignalDuration').value)
+    };
+
+    try {
+        const res = await fetch(`/api/live/${targetId}/settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Failed to sync.");
+        
+        // REMOVED: document.getElementById('deviceSettingsModal').classList.add('hidden');
+        // We leave the modal open so the user can see the button turn Yellow then Blue!
+
+    } catch (err) {
+        alert("Network error: Could not sync settings to device.");
+        btn.innerText = "Save & Sync";
+        btn.disabled = false;
+    }
+});
