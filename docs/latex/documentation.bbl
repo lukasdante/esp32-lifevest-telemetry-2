@@ -19,27 +19,272 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global}
-    \entry{einstein1905}{article}{}
+    \entry{analog2013ad8232}{manual}{}
       \name{author}{1}{}{%
-        {{hash=3ebf53e52a3ce84f0ffb8553200a6a63}{%
-           family={Einstein},
-           familyi={E\bibinitperiod},
-           given={Albert},
-           giveni={A\bibinitperiod}}}%
+        {{hash=a12ff886a2379a9ee6efaa9acfb54df4}{%
+           family={{Analog Devices}},
+           familyi={A\bibinitperiod}}}%
       }
-      \strng{namehash}{3ebf53e52a3ce84f0ffb8553200a6a63}
-      \strng{fullhash}{3ebf53e52a3ce84f0ffb8553200a6a63}
-      \strng{bibnamehash}{3ebf53e52a3ce84f0ffb8553200a6a63}
-      \strng{authorbibnamehash}{3ebf53e52a3ce84f0ffb8553200a6a63}
-      \strng{authornamehash}{3ebf53e52a3ce84f0ffb8553200a6a63}
-      \strng{authorfullhash}{3ebf53e52a3ce84f0ffb8553200a6a63}
+      \strng{namehash}{a12ff886a2379a9ee6efaa9acfb54df4}
+      \strng{fullhash}{a12ff886a2379a9ee6efaa9acfb54df4}
+      \strng{bibnamehash}{a12ff886a2379a9ee6efaa9acfb54df4}
+      \strng{authorbibnamehash}{a12ff886a2379a9ee6efaa9acfb54df4}
+      \strng{authornamehash}{a12ff886a2379a9ee6efaa9acfb54df4}
+      \strng{authorfullhash}{a12ff886a2379a9ee6efaa9acfb54df4}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{AD8232: Single-Lead, Heart Rate Monitor Front End}
+      \field{year}{2013}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.analog.com/media/en/technical-documentation/data-sheets/ad8232.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.analog.com/media/en/technical-documentation/data-sheets/ad8232.pdf
+      \endverb
+    \endentry
+    \entry{cloudflare_workers}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=1d212a7f3bda1d4cb8714d06bc601ab6}{%
+           family={{Cloudflare, Inc.}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{fullhash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{bibnamehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{authorbibnamehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{authornamehash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \strng{authorfullhash}{1d212a7f3bda1d4cb8714d06bc601ab6}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://developers.cloudflare.com/workers/}}
+      \field{title}{Cloudflare Workers Documentation: Serverless Computing at the Edge}
+      \field{year}{2024}
+      \true{nocite}
+    \endentry
+    \entry{dirienzo2021swimming}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=6ba4e4b10c2cc0ace2119a1fcfaa111a}{%
+           family={Di\bibnamedelima Rienzo},
+           familyi={D\bibinitperiod\bibinitdelim R\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {MDPI}%
+      }
+      \strng{namehash}{c613fe69ceb34f1c69fd1d13987a901b}
+      \strng{fullhash}{c613fe69ceb34f1c69fd1d13987a901b}
+      \strng{bibnamehash}{c613fe69ceb34f1c69fd1d13987a901b}
+      \strng{authorbibnamehash}{c613fe69ceb34f1c69fd1d13987a901b}
+      \strng{authornamehash}{c613fe69ceb34f1c69fd1d13987a901b}
+      \strng{authorfullhash}{c613fe69ceb34f1c69fd1d13987a901b}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Sensors}
+      \field{number}{12}
+      \field{title}{Validity of the Polar H10 Sensor for Heart Rate Monitoring during Swimming}
+      \field{volume}{21}
+      \field{year}{2021}
+      \true{nocite}
+      \field{pages}{4118}
+      \range{pages}{1}
+    \endentry
+    \entry{espressif2023esp32}{manual}{}
+      \name{author}{1}{}{%
+        {{hash=66589871a3c3f27bcbf3891133af42b1}{%
+           family={{Espressif Systems}},
+           familyi={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{66589871a3c3f27bcbf3891133af42b1}
+      \strng{fullhash}{66589871a3c3f27bcbf3891133af42b1}
+      \strng{bibnamehash}{66589871a3c3f27bcbf3891133af42b1}
+      \strng{authorbibnamehash}{66589871a3c3f27bcbf3891133af42b1}
+      \strng{authornamehash}{66589871a3c3f27bcbf3891133af42b1}
+      \strng{authorfullhash}{66589871a3c3f27bcbf3891133af42b1}
       \field{sortinit}{E}
       \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{journaltitle}{Annalen der Physik}
-      \field{title}{Zur Elektrodynamik bewegter Körper}
-      \field{year}{1905}
+      \field{note}{Version 4.1}
+      \field{title}{ESP32 Series Datasheet}
+      \field{year}{2023}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf
+      \endverb
+      \verb{url}
+      \verb https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf
+      \endverb
+    \endentry
+    \entry{iala2008marine}{report}{}
+      \name{author}{1}{}{%
+        {{hash=19c44b96cf16849cd3e96bf6b897093a}{%
+           family={{International Association of Marine Aids to Navigation and Lighthouse Authorities (IALA)}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {IALA}%
+      }
+      \strng{namehash}{19c44b96cf16849cd3e96bf6b897093a}
+      \strng{fullhash}{19c44b96cf16849cd3e96bf6b897093a}
+      \strng{bibnamehash}{19c44b96cf16849cd3e96bf6b897093a}
+      \strng{authorbibnamehash}{19c44b96cf16849cd3e96bf6b897093a}
+      \strng{authornamehash}{19c44b96cf16849cd3e96bf6b897093a}
+      \strng{authorfullhash}{19c44b96cf16849cd3e96bf6b897093a}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{number}{E-200-1}
+      \field{title}{Marine Signal Lights - Colours, Luminous Intensities and Ranges}
+      \field{type}{Recommendation}
+      \field{year}{2008}
+      \true{nocite}
+    \endentry
+    \entry{may2018epoxy}{book}{}
+      \name{author}{1}{}{%
+        {{hash=4c44e2894a437a041d233a821c776697}{%
+           family={May},
+           familyi={M\bibinitperiod},
+           given={Clayton\bibnamedelima A.},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Routledge}%
+      }
+      \strng{namehash}{4c44e2894a437a041d233a821c776697}
+      \strng{fullhash}{4c44e2894a437a041d233a821c776697}
+      \strng{bibnamehash}{4c44e2894a437a041d233a821c776697}
+      \strng{authorbibnamehash}{4c44e2894a437a041d233a821c776697}
+      \strng{authornamehash}{4c44e2894a437a041d233a821c776697}
+      \strng{authorfullhash}{4c44e2894a437a041d233a821c776697}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{2nd}
+      \field{title}{Epoxy Resins: Chemistry and Technology}
+      \field{year}{2018}
+      \true{nocite}
+    \endentry
+    \entry{pan1985real}{article}{}
+      \name{author}{2}{}{%
+        {{hash=ccdc3e3d241b1ce26d7c7d2405695bca}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Jiapu},
+           giveni={J\bibinitperiod}}}%
+        {{hash=eb83740709bd91915efe2912ce4ea048}{%
+           family={Tompkins},
+           familyi={T\bibinitperiod},
+           given={Willis\bibnamedelima J},
+           giveni={W\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{fullhash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{bibnamehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{authorbibnamehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{authornamehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{authorfullhash}{5e252c476d27bcdedcda3919fec475d6}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Biomedical Engineering}
+      \field{number}{3}
+      \field{title}{A Real-Time QRS Detection Algorithm}
+      \field{year}{1985}
+      \true{nocite}
+      \field{pages}{230\bibrangedash 236}
+      \range{pages}{7}
+    \endentry
+    \entry{petric2019lora}{inproceedings}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{1}{}{%
+        {{hash=99f51e516f389a34972d526baf81e848}{%
+           family={Petric},
+           familyi={P\bibinitperiod},
+           given={T.},
+           giveni={T\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{b368b432ad6537699107c00d13fe692f}
+      \strng{fullhash}{b368b432ad6537699107c00d13fe692f}
+      \strng{bibnamehash}{b368b432ad6537699107c00d13fe692f}
+      \strng{authorbibnamehash}{b368b432ad6537699107c00d13fe692f}
+      \strng{authornamehash}{b368b432ad6537699107c00d13fe692f}
+      \strng{authorfullhash}{b368b432ad6537699107c00d13fe692f}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{2019 IEEE International Black Sea Conference on Communications and Networking (BlackSeaCom)}
+      \field{title}{LoRa Measurements Over Water: A River and a Sea Scenario}
+      \field{year}{2019}
+      \true{nocite}
+      \field{pages}{1\bibrangedash 5}
+      \range{pages}{5}
+    \endentry
+    \entry{rashid2014power}{book}{}
+      \name{author}{1}{}{%
+        {{hash=878f5b85835c2ec57a487b2b1977e44d}{%
+           family={Rashid},
+           familyi={R\bibinitperiod},
+           given={Muhammad\bibnamedelima H.},
+           giveni={M\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Pearson}%
+      }
+      \strng{namehash}{878f5b85835c2ec57a487b2b1977e44d}
+      \strng{fullhash}{878f5b85835c2ec57a487b2b1977e44d}
+      \strng{bibnamehash}{878f5b85835c2ec57a487b2b1977e44d}
+      \strng{authorbibnamehash}{878f5b85835c2ec57a487b2b1977e44d}
+      \strng{authornamehash}{878f5b85835c2ec57a487b2b1977e44d}
+      \strng{authorfullhash}{878f5b85835c2ec57a487b2b1977e44d}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{4th}
+      \field{title}{Power Electronics: Circuits, Devices, and Applications}
+      \field{year}{2014}
+      \true{nocite}
+    \endentry
+    \entry{ublox2016neom8n}{manual}{}
+      \name{author}{1}{}{%
+        {{hash=b1754e5cb767b09c247d1f51b41d4ce5}{%
+           family={{u-blox}},
+           familyi={u\bibinitperiod}}}%
+      }
+      \strng{namehash}{b1754e5cb767b09c247d1f51b41d4ce5}
+      \strng{fullhash}{b1754e5cb767b09c247d1f51b41d4ce5}
+      \strng{bibnamehash}{b1754e5cb767b09c247d1f51b41d4ce5}
+      \strng{authorbibnamehash}{b1754e5cb767b09c247d1f51b41d4ce5}
+      \strng{authornamehash}{b1754e5cb767b09c247d1f51b41d4ce5}
+      \strng{authorfullhash}{b1754e5cb767b09c247d1f51b41d4ce5}
+      \field{sortinit}{u}
+      \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Document No. UBX-15031086}
+      \field{title}{NEO-M8N/M8Q - u-blox M8 Concurrent GNSS Modules Datasheet}
+      \field{year}{2016}
       \true{nocite}
     \endentry
   \enddatalist
