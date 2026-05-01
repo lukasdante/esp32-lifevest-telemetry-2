@@ -133,6 +133,20 @@ Once the gateway decodes a piggybacked command from the internet, it must ensure
 \subsection{Website}
 The website serves as the central command and monitoring hub for the Smart Lifevest system. Hosted entirely in the cloud, it is responsible for securely receiving the relayed data from the ground receiver station, permanently storing this information, and serving a live dashboard to both end-users and system administrators.
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../admin-adaptive.png}
+    \caption{User experience flowchart for admin users.}
+    \label{fig:Flowchart Admin}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../user-adaptive.png}
+    \caption{User experience flowchart for regular users.}
+    \label{fig:Flowchart User}
+\end{figure}
+
 \subsubsection{Database}
 The system's memory is structured as a relational database, designed to efficiently link user profiles with their real-time geographical and biological data.
 
@@ -146,7 +160,7 @@ The system's memory is structured as a relational database, designed to efficien
 \end{figure}
 The database architecture is divided into three primary categories:
 \begin{itemize}
-\item The \verb|Devices| table acts as the master registry. It bridges the physical hardware identifier (\verb|hw_id|) to a user-facing access code (\verb|login_id|). Beyond identification, it stores the personalized safety parameters for each vest, such as the heartbeat limit (\verb|device_hr_threshold|) and whether the alarms should trigger on their own (\verb|automate_signal|). It also contains a vital \verb|pending_command| queue, which acts as a holding area for instructions waiting to be sent back down to the physical lifevest.
+    \item The \verb|Devices| table acts as the master registry. It bridges the physical hardware identifier (\verb|hw_id|) to a user-facing access code (\verb|login_id|). Beyond identification, it stores the personalized safety parameters for each vest, such as the heartbeat limit (\verb|device_hr_threshold|) and whether the alarms should trigger on their own (\verb|automate_signal|). It also contains a vital \verb|pending_command| queue, which acts as a holding area for instructions waiting to be sent back down to the physical lifevest.
 \item The \verb|Telemetry| table serves as the continuous logbook. Every time the lifevest transmits a pulse, a new record is created here containing the user's \verb|heart_rate|, exact GPS coordinates (\verb|lat| and \verb|lng|), radio signal quality, and a precise \verb|timestamp|. This table is strictly tethered to the Devices table; if an administrator deletes a vest from the system, all of its historical tracking data is automatically erased as well.
 
 \item The \verb|Settings| table is a secure, isolated configuration file that holds global variables for the web application, such as the master password (\verb|admin_pin|) required to access the backend dashboard.
@@ -280,20 +294,47 @@ The Admin Page serves as the centralized command center for the organization dep
 
 
 \section{Hardware}
+The hardware architecture consists of two primary embedded systems: a wearable edge transmitter integrated into a marine lifevest, and a ground base station receiver acting as a network gateway. The lifevest device is completely self-contained and sealed to operate underwater, while the ground station handles long-range telemetry interception and cloud forwarding.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{../schematic.png}
+    \caption{Schematic diagram of the device.}
+    \label{fig:Schematic diagram}
+\end{figure}
 
 \subsection{Lifevest Device}
-% add circuit diagram
+The core processing unit of the wearable device is an ESP32 microcontroller. To ensure structural reliability during rapid prototyping, all internal components are securely soldered onto a custom perfboard rather than relying on loose breadboard connections.
+
 \subsubsection{Wireless Charging}
+To maintain the integrity of the waterproof enclosure, the device relies exclusively on inductive wireless charging, eliminating the need for exposed USB ports. An Elecrow wireless charging receiver module (rated for 600 mA maximum current) is connected to the `IN+` and `IN-` terminals of a TP4056 lithium battery charging module. The TP4056 handles the safe charging of a high-capacity 10,000 mAh LiPo battery connected across its `Bat+` and `Bat-` terminals. The internal receiver coil is positioned approximately 4 mm away from the external dock, passing energy through 3D-printed internal mounts and the outer plastic casing.
+
 \subsubsection{Waterproofing}
-\subsubsection{Antennas}
+The entire edge device is housed within a rigid NEMA-rated ABS plastic waterproof enclosure. Because ABS plastic is radio-transparent (invisible to RF signals), the system's antennas can be housed completely inside the case without degrading signal transmission. For environmental redundancy, marine-grade epoxy resin is applied to completely seal all external cable entry points and joints, ensuring the internal electronics remain dry even during prolonged submersion.
+
 \subsubsection{Boost Converters}
+Power distribution is managed via a main physical switch connected to the `Out+` terminal of the TP4056 module. Because the nominal voltage of the LiPo battery is only 3.7V, the system utilizes two distinct boost converters (an XL6009 and an LM2577). These DC-DC converters step up the battery voltage to an isolated 5V rail (to power the microcontroller, GPS, and sensors) and a 12V rail (dedicated entirely to driving the high-power emergency actuators).
+
 \subsubsection{MOSFET Control \& Actuators}
-\subsubsection{Sensor and Network Modules}
+Emergency signaling is handled by high-intensity 12V amber LED lights (drawing 70 mA) and a 12V auditory buzzer. Amber lighting was explicitly selected as it complies with international maritime signaling standards for high visibility in water environments. Because the ESP32 cannot directly supply 12V, the actuators are driven by logic-level IRLZ44N MOSFETs. The LED is triggered by GPIO 25, while the buzzer is triggered by GPIO 26. The MOSFET gate circuits include pull-down resistors to prevent floating, false-positive triggers, as well as series current-limiting resistors. The firmware utilizes Pulse Width Modulation (PWM) on these pins to manage the high current loads safely and reduce sudden current spikes on the battery rail.
+
+\subsubsection{Heart Rate Sensor}
+Biological data is gathered using an AD8232 single-lead ECG front-end module. The analog output of the sensor is routed to GPIO 34, while the hardware leads-off detection pins are connected to GPIO 35 (LO+) and GPIO 32 (LO-). To eliminate the risk of water ingress through a standard 3.5mm audio jack, the jack was bypassed entirely. The Right Arm (RA), Left Arm (LA), and Right Leg (RL) electrode wires are soldered directly to the AD8232 module pins. The wire bundle exits the case through a specialized waterproof cable gland filled with marine epoxy.
+
+\subsubsection{LoRa \& GPS Modules}
+Location tracking is handled by a NEO-M8N GPS module communicating over hardware serial pins 16 (RX) and 17 (TX). As previously noted, its ceramic patch antenna is mounted entirely inside the ABS casing to prevent water damage. Long-range telemetry is transmitted using a 433 MHz LoRa transceiver. The LoRa module utilizes the ESP32's SPI bus, wired to GPIO 4 (NSS), GPIO 5 (RST), and GPIO 2 (DIO0). It utilizes a standard radio antenna positioned optimally within the enclosure to propagate signals over the water's surface.
+
 \subsubsection{Modular Velcro Attachment}
+To ensure the hardware can be easily deployed and maintained, it is not permanently bonded to the life vest fabric. Instead, it utilizes a modular Velcro strap system. High-strength Velcro straps run horizontally (to the left and right) and vertically (below) the ABS enclosure, securely anchoring the heavy 10,000 mAh battery payload against the lifevest to prevent shifting during wave impact or active swimming.
 
 \subsection{Ground Receiver Station}
-% add circuit diagram
+The Ground Receiver Station serves as the terrestrial bridge for the system, safely housed on a boat or onshore. 
+
 \subsubsection{LoRa Module}
+The receiver relies on a secondary ESP32 microcontroller equipped with an identical 433 MHz LoRa transceiver. The hardware wiring explicitly mirrors the lifevest transmitter, utilizing SPI pins 4 (NSS), 5 (RST), and 2 (DIO0) to intercept incoming emergency packets and acknowledge commands over the airwaves.
+
+\subsection{Wireless Charging Transmitter}
+To recharge the sealed lifevest device, a separate standalone inductive charging transmitter was fabricated. This base station connects to a standard 9V 2A AC-DC wall adapter. When the lifevest enclosure is rested against the dock, magnetic coupling transfers power to the internal Elecrow receiver, allowing the system to charge seamlessly without compromising the marine epoxy and NEMA seals.
 
 
 
