@@ -270,9 +270,9 @@ function updateDashboardUI(data) {
     const diffMs = now - lastPingTime;
     
     let currentStatus = "LIVE";
-    if (diffMs >= 300000) { // 5 minutes (300,000 ms)
+    if (diffMs >= 60000) { // 1 minute (60,000 ms)
         currentStatus = "OFFLINE";
-    } else if (diffMs >= 60000) { // 1 minute (60,000 ms)
+    } else if (diffMs >= 30000) { // 30 seconds (30,000 ms)
         currentStatus = "WAITING";
     }
     
@@ -351,6 +351,9 @@ function updateDashboardUI(data) {
         document.getElementById('setActuateBuzzer').checked = !!data.deviceSettings.actuate_buzzer;
         document.getElementById('setDeviceHrThreshold').value = data.deviceSettings.device_hr_threshold;
         document.getElementById('setSignalDuration').value = data.deviceSettings.signal_duration;
+        document.getElementById('setProxyGps').checked = !!data.deviceSettings.proxy_gps;
+        document.getElementById('setProxyHrMin').value = data.deviceSettings.proxy_hr_min || 0;
+        document.getElementById('setProxyHrMax').value = data.deviceSettings.proxy_hr_max || 0;
     }
 
     hrElement.innerText = hrVal || '--';
@@ -379,8 +382,14 @@ function updateDashboardUI(data) {
     }
     
     // 7. Update Signal Bars and Viewport
-    updateSignalBars(data.rssi);
-    updateMapAndDistance(); 
+    let displayRssi = data.rssi;
+    
+    if (currentStatus === "OFFLINE") {
+        displayRssi = -120; // Force 0 bars
+    }
+
+    updateSignalBars(displayRssi, currentStatus);
+    updateMapAndDistance();
 
     // --- NEW: Universal Smart Button ACK Logic ---
     const signalBtn = document.getElementById('signalBtn');
@@ -437,22 +446,78 @@ function updateDashboardUI(data) {
     }
 }
 
-function updateSignalBars(rssi = -120) {
+function updateSignalBars(rssi = -120, status = "LIVE") {
     let activeBars = 0;
     if (rssi >= -95) activeBars = 4;
     else if (rssi >= -105) activeBars = 3;
     else if (rssi >= -115) activeBars = 2;
     else if (rssi > -120) activeBars = 1;
 
+    // 1. Handle the Red "X" Overlay Dynamically
+    const bar1 = document.getElementById('bar1');
+    if (bar1) {
+        // Grab the parent container holding the bars
+        const container = bar1.parentElement;
+        container.style.position = 'relative'; // Ensure the overlay stays inside
+
+        // Look for the overlay, create it if it doesn't exist yet
+        let xOverlay = document.getElementById('signalOfflineX');
+        if (!xOverlay) {
+            xOverlay = document.createElement('div');
+            xOverlay.id = 'signalOfflineX';
+            xOverlay.style.position = 'absolute';
+            xOverlay.style.top = '50%';
+            xOverlay.style.left = '50%';
+            xOverlay.style.transform = 'translate(-50%, -50%)';
+            xOverlay.style.width = '100%';
+            xOverlay.style.height = '120%'; // Slightly taller than the bars
+            xOverlay.style.zIndex = '10';
+            xOverlay.style.display = 'none';
+            xOverlay.style.display = 'flex';
+            xOverlay.style.justifyContent = 'center';
+            xOverlay.style.alignItems = 'center';
+            
+            // Professional Red SVG X Icon
+            xOverlay.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+            
+            container.appendChild(xOverlay);
+        }
+
+        // Show or hide the X based on status
+        if (status === "OFFLINE") {
+            xOverlay.style.display = 'flex';
+        } else {
+            xOverlay.style.display = 'none';
+        }
+    }
+
+    // 2. Paint the Bars
     for (let i = 1; i <= 4; i++) {
         const bar = document.getElementById(`bar${i}`);
         if (bar) {
-            if (i <= activeBars) bar.classList.add('active');
-            else bar.classList.remove('active');
+            // Reset to default empty state
+            bar.classList.remove('active');
+            bar.style.backgroundColor = ""; 
+            
+            if (status === "OFFLINE") {
+                // Dim the empty bars heavily so the Red X pops out
+                bar.style.opacity = "0.15"; 
+            } else {
+                bar.style.opacity = "1"; // Restore normal opacity
+                
+                // Color active bars
+                if (i <= activeBars) {
+                    bar.classList.add('active');
+                    
+                    // Turn yellow if waiting
+                    if (status === "WAITING" || status === "WAITING_INITIAL") {
+                        bar.style.backgroundColor = "#eab308"; 
+                    }
+                }
+            }
         }
     }
 }
-
 // ==========================================
 // DASHBOARD: VIEWPORT LOGIC
 // ==========================================
@@ -541,8 +606,6 @@ function initAdminPage() {
         loadFleetData();
     }
     
-    loadFleetData();
-
     // Physically force uppercase in the actual DOM values, not just visually
     document.getElementById('newHwId').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
     document.getElementById('newLoginId').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
@@ -587,6 +650,7 @@ function initAdminPage() {
             btn.disabled = false;
         }
     });
+
     // Physically force uppercase on the Edit Modal inputs too
     document.getElementById('editHwId').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
     document.getElementById('editLoginId').addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
@@ -663,9 +727,8 @@ function initAdminPage() {
     });
 
     // Fetch and populate current settings
-    fetch('/api/settings').then(r => r.json()).then(s => {
-        document.getElementById('setUpdateFreq').value = s.update_freq;
-        document.getElementById('setHrThreshold').value = s.hr_threshold;
+    fetch('/api/settings').then(r => r.json()).then(data => {
+        document.getElementById('adminUpdateFreq').value = data.update_freq;
     });
 
     // Save Settings & PIN
@@ -675,8 +738,7 @@ function initAdminPage() {
         const newPin = document.getElementById('setAdminPin').value.trim();
         
         const payload = {
-            update_freq: parseInt(document.getElementById('setUpdateFreq').value),
-            hr_threshold: parseInt(document.getElementById('setHrThreshold').value)
+            update_freq: parseInt(document.getElementById('adminUpdateFreq').value)
         };
 
         if (newPin !== '') {
@@ -708,8 +770,6 @@ function initAdminPage() {
 
     // Auto-refresh the fleet online status every 10 seconds
     setInterval(loadFleetData, 10000);
-
-
 }
 
 async function loadFleetData() {
@@ -912,7 +972,10 @@ document.getElementById('deviceSettingsForm')?.addEventListener('submit', async 
         actuate_led: document.getElementById('setActuateLed').checked,
         actuate_buzzer: document.getElementById('setActuateBuzzer').checked,
         hr_threshold: parseInt(document.getElementById('setDeviceHrThreshold').value),
-        signal_duration: parseInt(document.getElementById('setSignalDuration').value)
+        signal_duration: parseInt(document.getElementById('setSignalDuration').value),
+        proxy_gps: document.getElementById('setProxyGps').checked,
+        proxy_hr_min: parseInt(document.getElementById('setProxyHrMin').value) || 0,
+        proxy_hr_max: parseInt(document.getElementById('setProxyHrMax').value) || 0
     };
 
     try {

@@ -73,8 +73,9 @@ app.get('/api/live/:login_id', async (c) => {
   const loginId = c.req.param('login_id')
   
   // 1. Fetch device AND its specific settings
+  // FIX 1: Added the proxy columns to the SELECT query!
   const device = await c.env.DB.prepare(
-    `SELECT hw_id, automate_signal, actuate_led, actuate_buzzer, device_hr_threshold, signal_duration, pending_command 
+    `SELECT hw_id, automate_signal, actuate_led, actuate_buzzer, device_hr_threshold, signal_duration, pending_command, proxy_gps, proxy_hr_min, proxy_hr_max
      FROM Devices WHERE login_id = ? AND is_active = 1`
   ).bind(loginId).first()
 
@@ -84,7 +85,15 @@ app.get('/api/live/:login_id', async (c) => {
     `SELECT * FROM Telemetry WHERE hw_id = ? ORDER BY timestamp DESC LIMIT 1`
   ).bind(device.hw_id as string).first()
 
-  if (!data) return c.json({ isOnline: false, waitingForData: true, message: "Waiting for first ping..." })
+  // FIX 2: Even if there is no telemetry data yet, we MUST send the deviceSettings so the UI can pre-fill the form!
+  if (!data) {
+    return c.json({ 
+        isOnline: false, 
+        waitingForData: true, 
+        message: "Waiting for first ping...", 
+        deviceSettings: device 
+    });
+  }
 
   const lastSeen = new Date(data.timestamp as string).getTime()
   const isOnline = (new Date().getTime() - lastSeen) < 30000
@@ -200,74 +209,78 @@ app.delete('/api/admin/devices/:hw_id', async (c) => {
 });
 
 // ==========================================
-// GLOBAL SETTINGS ENDPOINTS
+// GLOBAL SETTINGS ENDPOINTS (ADMIN)
 // ==========================================
 app.get('/api/settings', async (c) => {
   const settings = await c.env.DB.prepare('SELECT * FROM Settings WHERE id = 1').first();
-  // Fallback to defaults if something goes wrong
-  return c.json(settings || { update_freq: 3000, hr_threshold: 100 });
+  return c.json(settings || { update_freq: 3000 });
 });
 
 app.put('/api/settings', async (c) => {
-  const { update_freq, hr_threshold, admin_pin } = await c.req.json();
-  
-  // If they provided a new PIN, update everything. Otherwise, just update the stats.
+  const { update_freq, admin_pin } = await c.req.json();
+
+  // 1. Update ONLY the database globals. No hardware is triggered here!
   if (admin_pin) {
     await c.env.DB.prepare(
-      'UPDATE Settings SET update_freq = ?, hr_threshold = ?, admin_pin = ? WHERE id = 1'
-    ).bind(update_freq, hr_threshold, admin_pin).run();
+      'UPDATE Settings SET update_freq = ?, admin_pin = ? WHERE id = 1'
+    ).bind(update_freq, admin_pin).run();
   } else {
     await c.env.DB.prepare(
-      'UPDATE Settings SET update_freq = ?, hr_threshold = ? WHERE id = 1'
-    ).bind(update_freq, hr_threshold).run();
+      'UPDATE Settings SET update_freq = ? WHERE id = 1'
+    ).bind(update_freq).run();
   }
+
   return c.json({ success: true });
 });
 
-
-// Export the app for web requests, AND a scheduled task for database cleanup
-export default {
-  fetch: app.fetch,
-  
-  // This runs automatically based on your wrangler.toml CRON schedule
-  async scheduled(event: any, env: Bindings, ctx: any) {
-    console.log("Running daily telemetry cleanup...");
-    // Deletes any telemetry rows older than 24 hours
-    ctx.waitUntil(
-      env.DB.prepare(`DELETE FROM Telemetry WHERE timestamp < datetime('now', '-1 day')`).run()
-    );
-  }
-};
-
+// ==========================================
+// USER DASHBOARD SETTINGS
+// ==========================================
 // Web Client POST Endpoint: Update device settings & queue Command 2
 app.post('/api/live/:login_id/settings', async (c) => {
   const loginId = c.req.param('login_id');
   const payload = await c.req.json();
-  const { automate_signal, actuate_led, actuate_buzzer, hr_threshold, signal_duration } = payload;
+  
+  // Extract ALL per-vest settings directly from the frontend request
+  const { 
+    automate_signal, actuate_led, actuate_buzzer, hr_threshold, signal_duration,
+    proxy_gps, proxy_hr_min, proxy_hr_max
+  } = payload;
 
-  // Format the command string payload for the ESP32 (cmd: 2 designates the action)
   const cmd2Payload = JSON.stringify({
     cmd: 2,
     auto: automate_signal ? 1 : 0,
     led: actuate_led ? 1 : 0,
     buz: actuate_buzzer ? 1 : 0,
     hr: hr_threshold,
-    dur: signal_duration
+    dur: signal_duration,
+    pgps: proxy_gps ? 1 : 0,
+    pmin: proxy_hr_min,
+    pmax: proxy_hr_max
   });
 
   await c.env.DB.prepare(
     `UPDATE Devices 
-     SET automate_signal = ?, actuate_led = ?, actuate_buzzer = ?, device_hr_threshold = ?, signal_duration = ?, pending_command = ?
+     SET automate_signal = ?, actuate_led = ?, actuate_buzzer = ?, device_hr_threshold = ?, signal_duration = ?, 
+         proxy_gps = ?, proxy_hr_min = ?, proxy_hr_max = ?, pending_command = ?
      WHERE login_id = ?`
   ).bind(
-    automate_signal ? 1 : 0, 
-    actuate_led ? 1 : 0, 
-    actuate_buzzer ? 1 : 0, 
-    hr_threshold, 
-    signal_duration, 
-    cmd2Payload, 
-    loginId
+    automate_signal ? 1 : 0, actuate_led ? 1 : 0, actuate_buzzer ? 1 : 0, 
+    hr_threshold, signal_duration, 
+    proxy_gps ? 1 : 0, proxy_hr_min, proxy_hr_max, 
+    cmd2Payload, loginId
   ).run();
 
   return c.json({ success: true, message: "Settings saved and Command 2 queued." });
 });
+
+// Export the app for web requests, AND a scheduled task for database cleanup
+export default {
+  fetch: app.fetch,
+  async scheduled(event: any, env: Bindings, ctx: any) {
+    console.log("Running daily telemetry cleanup...");
+    ctx.waitUntil(
+      env.DB.prepare(`DELETE FROM Telemetry WHERE timestamp < datetime('now', '-1 day')`).run()
+    );
+  }
+};

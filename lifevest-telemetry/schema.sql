@@ -17,7 +17,12 @@ CREATE TABLE Devices (
     actuate_led INTEGER DEFAULT 1,
     actuate_buzzer INTEGER DEFAULT 1,
     device_hr_threshold INTEGER DEFAULT 100,
-    signal_duration INTEGER DEFAULT 2,
+    signal_duration INTEGER DEFAULT 5,
+    
+    -- NEW: Proxy Settings moved here!
+    proxy_gps INTEGER DEFAULT 0,
+    proxy_hr_min INTEGER DEFAULT 0,
+    proxy_hr_max INTEGER DEFAULT 0,
     
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -35,17 +40,16 @@ CREATE TABLE Telemetry (
     FOREIGN KEY(hw_id) REFERENCES Devices(hw_id) ON DELETE CASCADE
 );
 
--- 3. Create Settings Table
+-- 3. Create Settings Table (Stripped down to web-only settings)
 CREATE TABLE Settings (
     id INTEGER PRIMARY KEY,
     update_freq INTEGER,
-    hr_threshold INTEGER,
     admin_pin TEXT
 );
 
 -- 4. Inject the Default System Settings
-INSERT INTO Settings (id, update_freq, hr_threshold, admin_pin) 
-VALUES (1, 3000, 100, '123456');
+INSERT INTO Settings (id, update_freq, admin_pin) 
+VALUES (1, 3000, '123456');
 
 -- 5. (Optional) Inject your first testing device
 INSERT INTO Devices (hw_id, login_id, name, base_location) 

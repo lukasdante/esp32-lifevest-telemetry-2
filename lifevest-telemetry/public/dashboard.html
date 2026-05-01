@@ -81,37 +81,59 @@
         </div>
 
     </footer>
-<div id="deviceSettingsModal" class="modal hidden" style="z-index: 2010;">
-    <div class="modal-content admin-panel" style="max-width: 400px;">
-        <h3>Vest Parameters</h3>
-        <form id="deviceSettingsForm">
-            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="margin-bottom: 0;">Automate Signal</label>
-                <input type="checkbox" id="setAutomateSignal" style="width: 20px; height: 20px; cursor: pointer;">
-            </div>
-            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="margin-bottom: 0;">Actuate LED</label>
-                <input type="checkbox" id="setActuateLed" style="width: 20px; height: 20px; cursor: pointer;">
-            </div>
-            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
-                <label style="margin-bottom: 0;">Actuate Buzzer</label>
-                <input type="checkbox" id="setActuateBuzzer" style="width: 20px; height: 20px; cursor: pointer;">
-            </div>
-            <div class="form-group">
-                <label>Heart Rate Threshold (BPM)</label>
-                <input type="number" id="setDeviceHrThreshold" required placeholder="e.g., 100">
-            </div>
-            <div class="form-group">
-                <label>Signal Duration (Seconds)</label>
-                <input type="number" id="setSignalDuration" required placeholder="e.g., 5">
-            </div>
-            
-            <div class="modal-actions">
-                <button type="submit" id="saveDeviceSettingsBtn" style="background-color: #0284c7;">Save & Sync</button>
-                <button type="button" onclick="document.getElementById('deviceSettingsModal').classList.add('hidden')" class="btn-cancel">Cancel</button>
-            </div>
-        </form>
+    <div id="deviceSettingsModal" class="modal hidden" style="z-index: 2010;">
+        <div class="modal-content admin-panel" style="max-width: 400px; max-height: 90vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 15px;">Vest Parameters</h3>
+            <form id="deviceSettingsForm">
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="margin-bottom: 0;">Automate Signal</label>
+                    <input type="checkbox" id="setAutomateSignal" style="width: 20px; height: 20px; cursor: pointer;">
+                </div>
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="margin-bottom: 0;">Actuate LED</label>
+                    <input type="checkbox" id="setActuateLed" style="width: 20px; height: 20px; cursor: pointer;">
+                </div>
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="margin-bottom: 0;">Actuate Buzzer</label>
+                    <input type="checkbox" id="setActuateBuzzer" style="width: 20px; height: 20px; cursor: pointer;">
+                </div>
+                <div class="form-group">
+                    <label>Heart Rate Threshold (BPM)</label>
+                    <input type="number" id="setDeviceHrThreshold" required placeholder="e.g., 100">
+                </div>
+                <div class="form-group">
+                    <label>Signal Duration (Seconds)</label>
+                    <input type="number" id="setSignalDuration" required placeholder="e.g., 5">
+                </div>
+                
+                <details style="margin-top: 15px; padding-bottom: 15px; padding-top: 15px; border-top: 1px solid #334155; outline: none;">
+                    <summary style="color: #64748b; font-size: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; list-style: none; user-select: none; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Advanced Developer Options</span>
+                        <span style="font-size: 10px;">▼</span>
+                    </summary>
+                    
+                    <div style="margin-top: 15px; padding: 10px; background-color: #0f172a; border-radius: 6px; border: 1px dashed #334155;">
+                        <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                            <label style="margin-bottom: 0;">Enable Simulated GPS</label>
+                            <input type="checkbox" id="setProxyGps" style="width: 20px; height: 20px; cursor: pointer;">
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label>Simulated Heart Rate (Min)</label>
+                            <input type="number" id="setProxyHrMin" placeholder="0 for real sensor">
+                        </div>
+                        <div class="form-group">
+                            <label>Simulated Heart Rate (Max)</label>
+                            <input type="number" id="setProxyHrMax" placeholder="0 for real sensor">
+                        </div>
+                    </div>
+                </details>
+                
+                <div class="modal-actions" style="margin-top: 10px;">
+                    <button type="submit" id="saveDeviceSettingsBtn" style="background-color: #0284c7;">Save & Sync</button>
+                    <button type="button" onclick="document.getElementById('deviceSettingsModal').classList.add('hidden')" class="btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 </body>
 </html>
